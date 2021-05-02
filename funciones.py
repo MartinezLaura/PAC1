@@ -5,17 +5,26 @@ import matplotlib.pyplot as plt
 import skimage.measure 
 
 
-def plot(img, name, color_legend):
+def plot(img, name, space):
   """Creamos una grafica donde cada banda de la imagen es visualizada separadamente
       de esta manera podemos ver que bandas capturan mejor la aberracion
       img: imagen 
       name:nombre del plot
-      color_legend: lista con los nombres de cada subplot"""
+      space: espacio de color que queremos usar para pintar, toma 2 valores posibles 'LAB' o 'RGB' """
   fig = plt.figure(figsize=(12,3))
   fig.suptitle(name, fontsize=16)
   ax = fig.add_subplot(1, 4, 1)
-  ax.imshow(img)
+  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  ax.imshow(img_rgb)
   ax.set_xlabel(name,fontsize=14)
+  if space == 'RGB':
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    color_legend = ['R: Rojo','G: Verde', 'B: Azul']
+  elif space == 'LAB':
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+    color_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
+  else:
+    color_legend = ['B: Azul','G: Verde','R: Rojo']
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 4, idx+2) 
     ax.imshow(img[:,:,idx]) 
