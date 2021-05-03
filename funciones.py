@@ -11,6 +11,7 @@ def plot(img, name, space):
       img: imagen 
       name:nombre del plot
       space: espacio de color que queremos usar para pintar, toma 2 valores posibles 'LAB' o 'RGB' """
+  
   fig = plt.figure(figsize=(12,3))
   fig.suptitle(name, fontsize=16)
   ax = fig.add_subplot(1, 4, 1)
@@ -27,6 +28,15 @@ def plot(img, name, space):
     ax = fig.add_subplot(1, 4, idx+2) 
     ax.imshow(img[:,:,idx]) 
     ax.set_xlabel(color_legend[idx],fontsize=14)
+    
+  #scatter plot
+  for idx, col in enumerate(color):
+    histr = cv2.calcHist([img],[idx],None,[256],[0,256])
+    plt.plot(histr, color = color_legend, label = name[idx])
+    plt.xlim([0,256])
+  leg = plt.legend(loc='best')
+  for l in leg.legendHandles:
+    l.set_linewidth(10)
   plt.show()
 
 def plot_scatter(img, name, color, mask = None):
@@ -34,8 +44,7 @@ def plot_scatter(img, name, color, mask = None):
       esto nos ayuda a ver la distribucion de los valores
       img: imagen 
       name:nombre del plot
-      color: lista con los colores de cada subplot
-      mask: opcional se anade si se quiere ver en el histograma solo una parte de la imagen"""
+      color: lista con los colores de cada subplot"""
   fig = plt.figure(figsize=(12,3))
   for idx, col in enumerate(color):
     histr = cv2.calcHist([img],[idx],None,[256],[0,256])
