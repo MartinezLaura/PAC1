@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import skimage.measure 
 
-
 def plot(img, name, space):
   """Creamos una grafica donde cada banda de la imagen es visualizada separadamente
       de esta manera podemos ver que bandas capturan mejor la aberracion
@@ -15,50 +14,33 @@ def plot(img, name, space):
   if space == 'RGB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     lab_legend = ['R: Rojo','G: Verde','B: Azul']
-    color_legend = ['R','G','B']
+    color_legend = ['r','g','b']
   elif space == 'LAB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     lab_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
     color_legend = ['Y','G','B']
     
   #Plot por bandas
-  fig = plt.figure(figsize=(12,3))
+  fig = plt.figure(figsize=(40,3))
   fig.suptitle(name, fontsize=16)
-  ax = fig.add_subplot(1, 4, 1)
+  ax = fig.add_subplot(1, 9, 1)
   img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
   ax.imshow(img_rgb)
   ax.set_xlabel(name,fontsize=14)
   for idx in range(img.shape[2]):
-    ax = fig.add_subplot(1, 4, idx+2) 
+    ax = fig.add_subplot(1, 9, idx+2) 
     ax.imshow(img[:,:,idx]) 
     ax.set_xlabel(lab_legend[idx],fontsize=14)
     
   #scatter plot
-  ax = fig.add_subplot(1, 4, 4)
+  ax = fig.add_subplot(1, 9, 5)
   for idx, col in enumerate(color_legend):
     histr = cv2.calcHist([img],[idx],None,[256],[0,256])
     ax.plot(histr, color = col, label = name[idx])
     ax.set_xlim([0,256])
   leg = ax.legend(loc='best')
   for l in leg.legendHandles:
-    l.set_linewidth(10)
-  plt.show()
-
-def plot_scatter(img, name, color, mask = None):
-  """Creamos una grafica donde cada banda de la imagen es representada en forma de histograma
-      esto nos ayuda a ver la distribucion de los valores
-      img: imagen 
-      name:nombre del plot
-      color: lista con los colores de cada subplot"""
-  fig = plt.figure(figsize=(12,3))
-  for idx, col in enumerate(color):
-    histr = cv2.calcHist([img],[idx],None,[256],[0,256])
-    plt.plot(histr, color = col, label = name[idx])
-    plt.xlim([0,256])
-  leg = plt.legend(loc='best')
-  for l in leg.legendHandles:
-    l.set_linewidth(10)
-  plt.title(name)
+    l.set_line
   plt.show()
 
 def moving_w(k, img, mask, funct):
