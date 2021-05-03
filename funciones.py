@@ -11,13 +11,7 @@ def plot(img, name, space):
       img: imagen 
       name:nombre del plot
       space: espacio de color que queremos usar para pintar, toma 2 valores posibles 'LAB' o 'RGB' """
-  
-  fig = plt.figure(figsize=(12,3))
-  fig.suptitle(name, fontsize=16)
-  ax = fig.add_subplot(1, 4, 1)
-  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  ax.imshow(img_rgb)
-  ax.set_xlabel(name,fontsize=14)
+   
   if space == 'RGB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     lab_legend = ['R: Rojo','G: Verde','B: Azul']
@@ -26,17 +20,26 @@ def plot(img, name, space):
     img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     lab_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
     color_legend = ['Y','G','B']
+    
+  #Plot por bandas
+  fig = plt.figure(figsize=(12,3))
+  fig.suptitle(name, fontsize=16)
+  ax = fig.add_subplot(1, 4, 1)
+  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  ax.imshow(img_rgb)
+  ax.set_xlabel(name,fontsize=14)
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 4, idx+2) 
     ax.imshow(img[:,:,idx]) 
     ax.set_xlabel(lab_legend[idx],fontsize=14)
     
   #scatter plot
+  ax = fig.add_subplot(1, 4, 4)
   for idx, col in enumerate(color_legend):
     histr = cv2.calcHist([img],[idx],None,[256],[0,256])
-    plt.plot(histr, color = col, label = name[idx])
-    plt.xlim([0,256])
-  leg = plt.legend(loc='best')
+    ax.plot(histr, color = col, label = name[idx])
+    ax.xlim([0,256])
+  leg = ax.legend(loc='best')
   for l in leg.legendHandles:
     l.set_linewidth(10)
   plt.show()
