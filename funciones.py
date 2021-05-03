@@ -39,8 +39,6 @@ def plot(img, name, space):
     ax.plot(histr, color = col, label = lab_legend[idx])
     ax.set_xlim([0,256])
   leg = ax.legend(loc='best')
-  for l in leg.legendHandles:
-    l.set_linedth(10)
   plt.show()
 
 def moving_w(k, img, mask, funct):
