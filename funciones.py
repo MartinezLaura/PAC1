@@ -20,19 +20,21 @@ def plot(img, name, space):
   ax.set_xlabel(name,fontsize=14)
   if space == 'RGB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    color_legend = ['R: Rojo','G: Verde', 'B: Azul']
+    lab_legend = ['R: Rojo','G: Verde','B: Azul']
+    color_legend = ['R','G','B']
   elif space == 'LAB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    color_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
+    lab_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
+    color_legend = ['Y','G','B']
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 4, idx+2) 
     ax.imshow(img[:,:,idx]) 
-    ax.set_xlabel(color_legend[idx],fontsize=14)
+    ax.set_xlabel(lab_legend[idx],fontsize=14)
     
   #scatter plot
-  for idx, col in enumerate(color):
+  for idx, col in enumerate(color_legend):
     histr = cv2.calcHist([img],[idx],None,[256],[0,256])
-    plt.plot(histr, color = color_legend, label = name[idx])
+    plt.plot(histr, color = col, label = name[idx])
     plt.xlim([0,256])
   leg = plt.legend(loc='best')
   for l in leg.legendHandles:
