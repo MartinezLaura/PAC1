@@ -23,8 +23,6 @@ def plot(img, name, space):
   elif space == 'LAB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     color_legend = ['L: Luminosidad','A: Verde-Rojo', 'B: Azul-Amarillo']
-  else:
-    color_legend = ['B: Azul','G: Verde','R: Rojo']
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 4, idx+2) 
     ax.imshow(img[:,:,idx]) 
@@ -127,43 +125,169 @@ def hist_thresh(img, banda):
   bin_mask_min = np.where(mask_min > 0, 1, 0)
   return bin_mask_min
 
-def autocontraste(x,a,b):
+def autocontraste(x,a,b,minv=0,maxv=255):
     '''Realiza el autocontraste llevando los puntos a y b a 0 y 225, respectivamente'''
+    if a < minv:
+        a = minv
+    if a > maxv:
+        a = maxv
+    if b < minv:
+        b = minv
+    if b > maxv:
+        b = maxv
+        
     if x<a:
-        y=0
+        y=minv
     elif x>b:
-        y=255
+        y=maxv
     else:
-        y=round((255/(b-a))*(x-a))
+        m = maxv-minv
+        n = b*minv - a*maxv
+        y=round((m*x+n)/(b-a))
     return y
 
-def realce(x,A,B):
-    ''' Función para realizar el realce: si A < B = realce sombras y si A > B = realce claros'''
-    if A < 0:
-        A=0
-    if A > 255:
-        A=255
-    if B < 0:
-        B=0
-    if B > 255:
-        B=255
-    if x <= A:
-        y = round(B*x/A)
+
+
+def median(img):
+  x = np.median(img[:,:,0])
+  y = np.median(img[:,:,1])
+  z = np.median(img[:,:,2])
+  return [[x,y,z], False]
+
+#definiciones de funciones usadas para la solucion 3
+class Params:
+    radius = 5.0
+    intensity = 1.0
+    min_brightness = 0.0
+    min_red_to_blue_ratio = 0.0
+    max_red_to_blue_ratio = 0.33
+   
+#perform motion blur on a column in an image
+def MotionBlurX(radius, w, h, img):
+    # make new array to hold the blur and initialize to full black
+    blur = np.full_like(img,0)
+    
+    #compute blur range
+    ww = 2 * radius + 1
+    for i in range(w):
+        # compute initial acc
+        acc = (radius + 2) * img[i,0,2]
+        for j in range(1,int(radius)):
+            acc += img[i,j,2]
+
+        #perform blur operation
+        for j in range(h):
+            acc = acc - img[i,max(0,j-1-int(radius)),2] + img[i,min(h-1, j+int(radius)), 2]
+            blur[i,j,2]=acc/ww
+
+    #done -> return blur
+    return blur
+
+def MotionBlurY(radius, w, h, img):
+    # make new array to hold the blur and initialize to full black
+    blur = np.full_like(img,0)
+    
+    #compute blur range
+    ww = 2 * radius + 1
+    for j in range(h):
+        #compute initial acc
+        acc = (radius + 2)*img[0,j,2]
+        for i in range(1,int(radius)):
+            acc += img[i,j,2]
+
+        #perform blur operation
+        for i in range(w):
+            acc = acc - img[max(0,i-1-int(radius)),j,2] + img[min(w-1,i+int(radius)),j ,2];
+            blur[i,j,2]=acc/ww
+    
+    #done -> return blur
+    return blur
+
+def BoxBlur(radius,w,h,img):
+    blurX = MotionBlurX(radius,w,h,img)
+    blurY = MotionBlurY(radius,w,h,blurX)
+    return blurY
+
+def DivUp(a,b):
+    r = a/b
+    if a%b == 0:
+        return r
     else:
-        y = round(((255-B)*x+(255*(B-A)))/(255-A))
-    return y
+        return (r+1)
 
-def logaritmo(x, maxv, alfa=0.5):
-    c = maxv/np.log(1+(np.e**alfa-1)*maxv)
-    y=c*np.log(1+(np.e**alfa-1)*x)
-    return round(y)
+def TentBlur(radius, w,h, img):
+    tmp = BoxBlur(DivUp(radius,2),w,h,img)
+    blur = BoxBlur(DivUp(radius,2),w,h,tmp)
+    return tmp
 
-def exponencial(x, maxv, alfa=10):
-    x=x/maxv
-    c = maxv/((1+alfa)-1)
-    y=c*((1+alfa)**x-1)
-    return y
+def MakePurpleBlur(params, img_original):
+    
+    #get img dimensions
+    dims = img_original.shape
 
+    # make new array to hold the blur and initialize to full black
+    mask = np.full_like(img_original,0)
+    
+    #store min brightness
+    thresh = params.min_brightness
+
+    #use the blue component to define the intensity of the light
+    #subject to unfocusing
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            b = img_original[i,j,2]/255.0
+            grey = max(0.0, (b-thresh))*(1.0/(1.0-thresh))
+            p = params.intensity*grey
+            mask[i,j,2] = p*255
+
+    blur = TentBlur(params.radius,dims[0],dims[1],mask)
+    return blur
+
+def RemovePurpleBlur(params, img, mask):
+    #copy img to result
+    res = img.copy()
+    #get img dimensions
+    dims = img.shape
+    
+    for i in range(dims[0]):
+        for j in range(dims[1]):
+            imgColor = img[i,j,:] / 255.0
+            mskColor = mask[i,j,:] / 255.0
+            bl = min(1, mskColor[2])
+
+            #amount of blue and red that would produce a grey if removed
+            db = max(0, imgColor[2] - imgColor[1])
+            dr = max(0, imgColor[0] - imgColor[1])
+
+            #maximum amount of blue that we accept to remove, ignoring red level
+            mb = min(bl,db)
+
+            #amount of red that we will remove, honoring max red:blue ratio
+            r_diff = min(dr, params.max_red_to_blue_ratio)
+
+            #amount of blue that we will remove, honoring min red:blue ratio
+            if params.min_red_to_blue_ratio > 0:
+                b_diff = min(mb, r_diff / params.min_red_to_blue_ratio)
+            else:
+                b_diff = mb
+
+            res[i,j,0] = (imgColor[0]-r_diff) * 255.0
+            res[i,j,1] = (imgColor[1]       ) * 255.0
+            res[i,j,2] = (imgColor[2]-b_diff) * 255.0
+
+    #done return res
+    return res
+
+def Unpurple(params, img_original):
+    #generate blurred mask from original image
+    mask = MakePurpleBlur(params, img_original)
+
+    #use blurred mask to remove fringing
+    output = RemovePurpleBlur(params, img_original, mask)
+
+    return mask,output
+  
+ #Estas funciones no se usan en el codigo pero han sido intentos realizados durante la practica
 def im_resize(img, alpha):
   width = int(img.shape[1] * alpha)
   height = int(img.shape[0] * alpha)
@@ -239,8 +363,29 @@ def corregir_franja(copyimg):
   imCORRECT[:,:,0] = scaleim(img[:,:,0], 1/alphaB)
   return imCORRECT
 
-def median(img):
-  x = np.median(img[:,:,0])
-  y = np.median(img[:,:,1])
-  z = np.median(img[:,:,2])
-  return [[x,y,z], False]
+def realce(x,A,B):
+    ''' Función para realizar el realce: si A < B = realce sombras y si A > B = realce claros'''
+    if A < 0:
+        A=0
+    if A > 255:
+        A=255
+    if B < 0:
+        B=0
+    if B > 255:
+        B=255
+    if x <= A:
+        y = round(B*x/A)
+    else:
+        y = round(((255-B)*x+(255*(B-A)))/(255-A))
+    return y
+
+def logaritmo(x, maxv, alfa=0.5):
+    c = maxv/np.log(1+(np.e**alfa-1)*maxv)
+    y=c*np.log(1+(np.e**alfa-1)*x)
+    return round(y)
+
+def exponencial(x, maxv, alfa=10):
+    x=x/maxv
+    c = maxv/((1+alfa)-1)
+    y=c*((1+alfa)**x-1)
+    return y
