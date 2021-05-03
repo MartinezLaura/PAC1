@@ -24,8 +24,7 @@ def plot(img, name, space):
   fig = plt.figure(figsize=(40,3))
   fig.suptitle(name, fontsize=16)
   ax = fig.add_subplot(1, 9, 1)
-  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-  ax.imshow(img_rgb)
+  ax.imshow(img)
   ax.set_xlabel(name,fontsize=14)
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 9, idx+2) 
