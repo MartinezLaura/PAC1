@@ -82,12 +82,14 @@ def moving_w(k, img, mask, funct):
       img[idx[0][i], idx[1][i], 2] = result[0][2]
   return img
 
-def hist_thresh(img, banda):
+def hist_thresh(img, banda, ttipo):
   """Codigo para extraer de manera automatica un valor threshold a partir de 
   maximizar la variancia entre los grupos o bins del histograma.
   Codigo basado en: https://docs.opencv.org/master/d7/d4d/tutorial_py_thresholding.html
   img: imagen a analizar
   banda: banda donde se hara la binarizacion
+  tipo: si 'min' se binarizaran los valores mas bajo del threshold
+        si 'maz' se binarizaran los maximos
   Se retorna la mascara binaria
   """
   imgh = img[:,:,banda]
@@ -114,8 +116,13 @@ def hist_thresh(img, banda):
   #Realizamos el threshold con el valor maximo y el obtenido en el metodo anterior
   mask_min = cv2.threshold(img[:,:,banda], thresh, np.max(img[:,:,banda]), cv2.THRESH_BINARY)
   mask_min = np.array(mask_min[1])
-  #Creamos la mascara binaria
-  bin_mask_min = np.where(mask_min > 0, 1, 0)
+  if tipo == 'max:
+    #Creamos la mascara binaria
+    bin_mask_min = np.where(mask_min > 0, 1, 0)
+  elif tipo == 'min:
+    #Creamos la mascara binaria
+    bin_mask_min = np.where(mask_min < 0, 1, 0)
+  
   return bin_mask_min
 
 def autocontraste(x,a,b,minv=0,maxv=255):
