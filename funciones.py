@@ -10,7 +10,13 @@ def plot(img, name, space):
       img: imagen 
       name:nombre del plot
       space: espacio de color que queremos usar para pintar, toma 2 valores posibles 'LAB' o 'RGB' """
-   
+  
+  fig = plt.figure(figsize=(40,3))
+  fig.suptitle(name, fontsize=16)
+  ax = fig.add_subplot(1, 9, 1)
+  img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+  ax.imshow(img_rgb)
+  ax.set_xlabel(name,fontsize=14) 
   if space == 'RGB':
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     lab_legend = ['R: Rojo','G: Verde','B: Azul']
@@ -21,11 +27,6 @@ def plot(img, name, space):
     color_legend = ['Y','G','B']
     
   #Plot por bandas
-  fig = plt.figure(figsize=(40,3))
-  fig.suptitle(name, fontsize=16)
-  ax = fig.add_subplot(1, 9, 1)
-  ax.imshow(img)
-  ax.set_xlabel(name,fontsize=14)
   for idx in range(img.shape[2]):
     ax = fig.add_subplot(1, 9, idx+2) 
     ax.imshow(img[:,:,idx]) 
@@ -111,7 +112,7 @@ def hist_thresh(img, banda, tipo):
   # Maximizamos la varianzia entre clases escogiendo el maximo valor mas repetido
   index_of_max_val = np.argmax(inter_class_variance)
   thresh = bin_mids[:-1][index_of_max_val]
-  print("Los valores escogidos para el thresh, en la banda {} son:{}, {}".format(banda, np.max(img[:,:,banda]) , thresh))
+  print("Los valores escogidos para el umbral, en la banda {} son:{}, {}".format(banda, np.max(img[:,:,banda]) , thresh))
   
   #Realizamos el threshold con el valor maximo y el obtenido en el metodo anterior
   mask_min = cv2.threshold(img[:,:,banda], thresh, np.max(img[:,:,banda]), cv2.THRESH_BINARY)
