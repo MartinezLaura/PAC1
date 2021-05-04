@@ -149,3 +149,4 @@ def img_slid(path_img):
         value=2,
         description='Imagen:',
     )
+    return img
