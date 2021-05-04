@@ -116,10 +116,10 @@ def hist_thresh(img, banda, ttipo):
   #Realizamos el threshold con el valor maximo y el obtenido en el metodo anterior
   mask_min = cv2.threshold(img[:,:,banda], thresh, np.max(img[:,:,banda]), cv2.THRESH_BINARY)
   mask_min = np.array(mask_min[1])
-  if tipo == 'max:
+  if tipo == 'max':
     #Creamos la mascara binaria
     bin_mask_min = np.where(mask_min > 0, 1, 0)
-  elif tipo == 'min:
+  elif tipo == 'min':
     #Creamos la mascara binaria
     bin_mask_min = np.where(mask_min < 0, 1, 0)
   
