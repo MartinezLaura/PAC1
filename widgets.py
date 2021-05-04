@@ -69,3 +69,84 @@ def widget_CIE(path_img):
         description='Imagen:',
     )
     return [mi, ma, a, b, img]
+
+def widget_RGB(path_img):
+   intensity_slider = widgets.FloatSlider(
+        value=1.0,
+        min=0,
+        max=10.0,
+        step=0.01,
+        description='Intensity:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.2f',
+    )
+
+    min_brightness_slider = widgets.FloatSlider(
+        value=0.0,
+        min=0,
+        max=10.0,
+        step=0.01,
+        description='Minimum Mask Brightness:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.2f',
+    )
+
+    min_ratio_slider = widgets.FloatSlider(
+        value=0,
+        min=0,
+        max=10.0,
+        step=0.01,
+        description='Ratio Red/Blue Min:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.2f',
+    )
+
+    max_ratio_slider = widgets.FloatSlider(
+        value=0.33,
+        min=0,
+        max=10.0,
+        step=0.01,
+        description='Ratio Red/Blue Max:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.2f',
+    )
+
+    radius_slider = widgets.FloatSlider(
+        value=5.0,
+        min=0,
+        max=10.0,
+        step=0.01,
+        description='Radius:',
+        disabled=False,
+        continuous_update=False,
+        orientation='horizontal',
+        readout=True,
+        readout_format='.2f',
+    )
+
+    # cargamos todas las imagenes que tenemos
+    image_list = []
+    counter = 1
+    for file in os.listdir(path_img):
+      image_list.append((file,counter))
+      counter += 1
+
+    img_dropdown = widgets.Dropdown(
+        options=image_list,
+        value=2,
+        description='Test Image:',
+    )
+    
+    return [intensity_slider, min_brightness_slider, min_ratio_slider, max_ratio_slider, radius_slider, img_dropdown]
