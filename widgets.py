@@ -4,7 +4,7 @@ from ipywidgets import interactive
 
 """"Generacion del las funciones para crear los widgets de seleccion de parametros para la solucion 1"""
 def widget_CIE(path_img):
-    min_slider = widgets.IntSlider(
+    mi = widgets.IntSlider(
         value=120,
         min=0,
         max=255,
@@ -16,9 +16,8 @@ def widget_CIE(path_img):
         readout=True,
         readout_format='d',
     )
-    mi = interactive(min_slider)
-
-    max_slider = widgets.IntSlider(
+    
+    ma = widgets.IntSlider(
         value=150,
         min=0,
         max=255,
@@ -30,9 +29,8 @@ def widget_CIE(path_img):
         readout=True,
         readout_format='d',
     )
-    ma = interactive(max_slider)
 
-    a_slider = widgets.IntSlider(
+    a = widgets.IntSlider(
         value=125,
         min=0,
         max=255,
@@ -44,9 +42,8 @@ def widget_CIE(path_img):
         readout=True,
         readout_format='d',
     )
-    a = interactive(a_slider)
 
-    b = b_slider = widgets.IntSlider(
+    b = widgets.IntSlider(
         value=140,
         min=0,
         max=255,
@@ -58,7 +55,6 @@ def widget_CIE(path_img):
         readout=True,
         readout_format='d',
     )
-    interactive(b_slider)
 
     # cargamos todas las imagenes que tenemos
     image_list = []
@@ -67,10 +63,9 @@ def widget_CIE(path_img):
       image_list.append((file,counter))
       counter += 1
 
-    img_dropdown = widgets.Dropdown(
+    img = widgets.Dropdown(
         options=image_list,
         value=2,
         description='Imagen:',
     )
-    img = interactive(img_dropdown)
     return [mi, ma, a, b, img, image_list]
