@@ -126,7 +126,7 @@ def hist_thresh(img, banda, tipo):
   return bin_mask_min
 
 def autocontraste(x,a,b,minv=0,maxv=255):
-    '''Realiza el autocontraste llevando los puntos a y b a 0 y 225, respectivamente'''
+    '''Realiza el autocontraste llevando los puntos a y b a minv y maxv, respectivamente'''
     if a < minv:
         a = minv
     if a > maxv:
