@@ -71,7 +71,7 @@ def widget_CIE(path_img):
     return [mi, ma, a, b, img]
 
 def widget_RGB(path_img):
-   intensity_slider = widgets.FloatSlider(
+    intensity_slider = widgets.FloatSlider(
         value=1.0,
         min=0,
         max=10.0,
