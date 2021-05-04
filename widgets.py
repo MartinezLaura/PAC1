@@ -72,4 +72,4 @@ def widget_CIE(path_img):
         description='Imagen:',
     )
     display(img_dropdown)
-    return [min_slider.value, max_slider.value, a_slider.value, b.b_slider.value, image_list, img_dropdwon.value]
+    return [min_slider.value, max_slider.value, a_slider.value, b_slider.value, image_list, img_dropdwon.value]
