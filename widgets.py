@@ -3,7 +3,7 @@ import os
 from ipywidgets import interactive
 
 """"Generacion del las funciones para crear los widgets de seleccion de parametros para la solucion 1"""
-def widget_CIE(path_img):
+def widget_CIE():
     mi = widgets.IntSlider(
         value=120,
         min=0,
@@ -56,21 +56,9 @@ def widget_CIE(path_img):
         readout_format='d',
     )
 
-    # cargamos todas las imagenes que tenemos
-    image_list = []
-    counter = 1
-    for file in os.listdir(path_img):
-      image_list.append((file,counter))
-      counter += 1
+    return [mi, ma, a, b]
 
-    img = widgets.Dropdown(
-        options=image_list,
-        value=2,
-        description='Imagen:',
-    )
-    return [mi, ma, a, b, img]
-
-def widget_RGB(path_img):
+def widget_RGB():
     intensity_slider = widgets.FloatSlider(
         value=1.0,
         min=0,
@@ -145,4 +133,19 @@ def widget_RGB(path_img):
         description='Test Image:',
     )
     
-    return [intensity_slider, min_brightness_slider, min_ratio_slider, max_ratio_slider, radius_slider, img_dropdown]
+    return [intensity_slider, min_brightness_slider, min_ratio_slider, max_ratio_slider, radius_slider]
+
+def img_slid(path_img):
+    
+    # cargamos todas las imagenes que tenemos
+    image_list = []
+    counter = 1
+    for file in os.listdir(path_img):
+      image_list.append((file,counter))
+      counter += 1
+
+    img = widgets.Dropdown(
+        options=image_list,
+        value=2,
+        description='Imagen:',
+    )
