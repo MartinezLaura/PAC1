@@ -68,4 +68,4 @@ def widget_CIE(path_img):
         value=2,
         description='Imagen:',
     )
-    return [mi, ma, a, b, img, image_list]
+    return [mi, ma, a, b, img]
