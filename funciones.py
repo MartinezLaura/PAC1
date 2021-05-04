@@ -82,7 +82,7 @@ def moving_w(k, img, mask, funct):
       img[idx[0][i], idx[1][i], 2] = result[0][2]
   return img
 
-def hist_thresh(img, banda, ttipo):
+def hist_thresh(img, banda, tipo):
   """Codigo para extraer de manera automatica un valor threshold a partir de 
   maximizar la variancia entre los grupos o bins del histograma.
   Codigo basado en: https://docs.opencv.org/master/d7/d4d/tutorial_py_thresholding.html
