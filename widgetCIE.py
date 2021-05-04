@@ -1,4 +1,7 @@
 import ipywidgets as widgets
+import os
+
+""""Generacion del las funciones para crear los widgets de seleccion de parametros para la solucion 1"""
 min_slider = widgets.IntSlider(
     value=120,
     min=0,
