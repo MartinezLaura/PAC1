@@ -81,7 +81,6 @@ def moving_w(k, img, mask, funct):
       img[idx[0][i], idx[1][i], 1] = result[0][1]
       img[idx[0][i], idx[1][i], 2] = result[0][2]
   return img
-
 def hist_thresh(img, banda, tipo):
   """Codigo para extraer de manera automatica un valor threshold a partir de 
   maximizar la variancia entre los grupos o bins del histograma.
@@ -121,7 +120,7 @@ def hist_thresh(img, banda, tipo):
     bin_mask_min = np.where(mask_min > 0, 1, 0)
   elif tipo == 'min':
     #Creamos la mascara binaria
-    bin_mask_min = np.where(mask_min < 0, 1, 0)
+    bin_mask_min = np.where(mask_min > 0, 0, 1)
   
   return bin_mask_min
 
