@@ -81,6 +81,7 @@ def moving_w(k, img, mask, funct):
       img[idx[0][i], idx[1][i], 1] = result[0][1]
       img[idx[0][i], idx[1][i], 2] = result[0][2]
   return img
+
 def hist_thresh(img, banda, tipo):
   """Codigo para extraer de manera automatica un valor threshold a partir de 
   maximizar la variancia entre los grupos o bins del histograma.
@@ -145,12 +146,13 @@ def autocontraste(x,a,b,minv=0,maxv=255):
         y=round((m*x+n)/(b-a))
     return y
 
-
-
-def median(img):
-  x = np.median(img[:,:,0])
-  y = np.median(img[:,:,1])
-  z = np.median(img[:,:,2])
+def mean(img):
+  """Realiza el calculo de valos medio de la imagen dada por banda.
+  Esto ayuda a suavizar la senal
+  Retorna: el valor"""
+  x = np.mean(img[:,:,0])
+  y = np.mean(img[:,:,1])
+  z = np.mean(img[:,:,2])
   return [[x,y,z], False]
 
 #definiciones de funciones usadas para la solucion 3
