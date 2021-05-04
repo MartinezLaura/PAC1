@@ -83,7 +83,6 @@ def widget_RGB(path_img):
         readout=True,
         readout_format='.2f',
     )
-
     min_brightness_slider = widgets.FloatSlider(
         value=0.0,
         min=0,
@@ -96,7 +95,6 @@ def widget_RGB(path_img):
         readout=True,
         readout_format='.2f',
     )
-
     min_ratio_slider = widgets.FloatSlider(
         value=0,
         min=0,
@@ -109,7 +107,6 @@ def widget_RGB(path_img):
         readout=True,
         readout_format='.2f',
     )
-
     max_ratio_slider = widgets.FloatSlider(
         value=0.33,
         min=0,
@@ -122,7 +119,6 @@ def widget_RGB(path_img):
         readout=True,
         readout_format='.2f',
     )
-
     radius_slider = widgets.FloatSlider(
         value=5.0,
         min=0,
