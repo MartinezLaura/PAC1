@@ -169,11 +169,11 @@ def mean(img):
 
 #definiciones de funciones usadas para la solucion 2
 class Params:
-    radius = 5.0
-    intensity = 1.0
-    min_brightness = 0.0
-    min_red_to_blue_ratio = 0.0
-    max_red_to_blue_ratio = 0.33
+   radius = 5.0
+   intensity = 1.0
+   min_brightness = 0.0
+   min_red_to_blue_ratio = 0.0
+   max_red_to_blue_ratio = 0.33
    
 #perform motion blur on a column in an image
 def MotionBlurX(radius, w, h, img):
@@ -183,21 +183,21 @@ def MotionBlurX(radius, w, h, img):
   w,h: ancho y alto de la imagen
   img: imagen a sacar la mascara borrosa
   retorna canal azul emborronado"""
-    # make new array to hold the blur and initialize to full black
-    blur = np.full_like(img,0)  
-    #compute blur range
-    ww = 2 * radius + 1
-    for i in range(w):
-        # compute initial acc
-        acc = (radius + 2) * img[i,0,2]
-        for j in range(1,int(radius)):
-            acc += img[i,j,2]
-        #perform blur operation
-        for j in range(h):
-            acc = acc - img[i,max(0,j-1-int(radius)),2] + img[i,min(h-1, j+int(radius)), 2]
-            blur[i,j,2]=acc/ww
-    #done -> return blur
-    return blur
+  # make new array to hold the blur and initialize to full black
+  blur = np.full_like(img,0)  
+  #compute blur range
+  ww = 2 * radius + 1
+  for i in range(w):
+      # compute initial acc
+      acc = (radius + 2) * img[i,0,2]
+      for j in range(1,int(radius)):
+          acc += img[i,j,2]
+      #perform blur operation
+      for j in range(h):
+          acc = acc - img[i,max(0,j-1-int(radius)),2] + img[i,min(h-1, j+int(radius)), 2]
+          blur[i,j,2]=acc/ww
+  #done -> return blur
+  return blur
 
 def MotionBlurY(radius, w, h, img):
     """se genera la borrisidad de la realizada en MotionBlurX para poder
@@ -206,44 +206,44 @@ def MotionBlurY(radius, w, h, img):
   w,h: ancho y alto de la imagen
   img: imagen a sacar la mascara borrosa
   retorna canal azul emborronado""""
-    # make new array to hold the blur and initialize to full black
-    blur = np.full_like(img,0)
-    
-    #compute blur range
-    ww = 2 * radius + 1
-    for j in range(h):
-        #compute initial acc
-        acc = (radius + 2)*img[0,j,2]
-        for i in range(1,int(radius)):
-            acc += img[i,j,2]
+  # make new array to hold the blur and initialize to full black
+  blur = np.full_like(img,0)
 
-        #perform blur operation
-        for i in range(w):
-            acc = acc - img[max(0,i-1-int(radius)),j,2] + img[min(w-1,i+int(radius)),j ,2];
-            blur[i,j,2]=acc/ww
-    
-    #done -> return blur
-    return blur
+  #compute blur range
+  ww = 2 * radius + 1
+  for j in range(h):
+      #compute initial acc
+      acc = (radius + 2)*img[0,j,2]
+      for i in range(1,int(radius)):
+          acc += img[i,j,2]
+
+      #perform blur operation
+      for i in range(w):
+          acc = acc - img[max(0,i-1-int(radius)),j,2] + img[min(w-1,i+int(radius)),j ,2];
+          blur[i,j,2]=acc/ww
+
+  #done -> return blur
+  return blur
 
 def BoxBlur(radius,w,h,img):
   """Se llaman a las funciones que dado un radio, ancho, alto de una imagen
   se realiza la mascara borrosa necesaria para detectar y corregir la aberracion
   retorna la mascara
   """
-    blurX = MotionBlurX(radius,w,h,img)
-    blurY = MotionBlurY(radius,w,h,blurX)
-    return blurY
+  blurX = MotionBlurX(radius,w,h,img)
+  blurY = MotionBlurY(radius,w,h,blurX)
+  return blurY
 
 def DivUp(a,b):
   """Dado un radio se divide por la mitad para pasar el desplazamiento, 
   con respecto al pixel central, que tendra el kernel que realiza la mascara
   se retorna el kernel
   """
-    r = a/b
-    if a%b == 0:
-        return r
-    else:
-        return (r+1)
+  r = a/b
+  if a%b == 0:
+      return r
+  else:
+      return (r+1)
 
 def TentBlur(radius, w,h, img):
   """Dado un radio, ancho, alto de una imagen, se generan la mascara donde se aplicara 
@@ -252,83 +252,83 @@ def TentBlur(radius, w,h, img):
   de la abeeracion creada y la original
   retorna la mascara que se usara para la correccion
   """
-    tmp = BoxBlur(DivUp(radius,2),w,h,img)
-    blur = BoxBlur(DivUp(radius,2),w,h,tmp)
-    return tmp
+  tmp = BoxBlur(DivUp(radius,2),w,h,img)
+  blur = BoxBlur(DivUp(radius,2),w,h,tmp)
+  return tmp
 
 def MakePurpleBlur(params, img_original):
-     """Dados los parametros selecionados en el widget y la imagen con la aberracion
-     se genera la mascara donde se realizara la correccion. Pasos explicados en cada funcion
-     retorna la mascara del componente azul a usar
-    """
-    #get img dimensions
-    dims = img_original.shape
-    # make new array to hold the blur and initialize to full black
-    mask = np.full_like(img_original,0)
-    #store min brightness
-    thresh = params.min_brightness
-    #use the blue component to define the intensity of the light
-    #subject to unfocusing
-    for i in range(dims[0]):
-        for j in range(dims[1]):
-            b = img_original[i,j,2]/255.0
-            grey = max(0.0, (b-thresh))*(1.0/(1.0-thresh))
-            p = params.intensity*grey
-            mask[i,j,2] = p*255
+   """Dados los parametros selecionados en el widget y la imagen con la aberracion
+   se genera la mascara donde se realizara la correccion. Pasos explicados en cada funcion
+   retorna la mascara del componente azul a usar
+  """
+  #get img dimensions
+  dims = img_original.shape
+  # make new array to hold the blur and initialize to full black
+  mask = np.full_like(img_original,0)
+  #store min brightness
+  thresh = params.min_brightness
+  #use the blue component to define the intensity of the light
+  #subject to unfocusing
+  for i in range(dims[0]):
+      for j in range(dims[1]):
+          b = img_original[i,j,2]/255.0
+          grey = max(0.0, (b-thresh))*(1.0/(1.0-thresh))
+          p = params.intensity*grey
+          mask[i,j,2] = p*255
 
-    blur = TentBlur(params.radius,dims[0],dims[1],mask)
-    return blur
+  blur = TentBlur(params.radius,dims[0],dims[1],mask)
+  return blur
 
 def RemovePurpleBlur(params, img, mask):
-    """Dados los parametros selecionados en el widget, la imagen con la aberracion y la mascara donde corregir,
-    se corrige la aberracion
-    retorna la imagen corregida
-    """
-    #copy img to result
-    res = img.copy()
-    #get img dimensions
-    dims = img.shape
-    
-    for i in range(dims[0]):
-        for j in range(dims[1]):
-            imgColor = img[i,j,:] / 255.0
-            mskColor = mask[i,j,:] / 255.0
-            bl = min(1, mskColor[2])
+  """Dados los parametros selecionados en el widget, la imagen con la aberracion y la mascara donde corregir,
+  se corrige la aberracion
+  retorna la imagen corregida
+  """
+  #copy img to result
+  res = img.copy()
+  #get img dimensions
+  dims = img.shape
 
-            #amount of blue and red that would produce a grey if removed
-            db = max(0, imgColor[2] - imgColor[1])
-            dr = max(0, imgColor[0] - imgColor[1])
+  for i in range(dims[0]):
+      for j in range(dims[1]):
+          imgColor = img[i,j,:] / 255.0
+          mskColor = mask[i,j,:] / 255.0
+          bl = min(1, mskColor[2])
 
-            #maximum amount of blue that we accept to remove, ignoring red level
-            mb = min(bl,db)
+          #amount of blue and red that would produce a grey if removed
+          db = max(0, imgColor[2] - imgColor[1])
+          dr = max(0, imgColor[0] - imgColor[1])
 
-            #amount of red that we will remove, honoring max red:blue ratio
-            r_diff = min(dr, params.max_red_to_blue_ratio)
+          #maximum amount of blue that we accept to remove, ignoring red level
+          mb = min(bl,db)
 
-            #amount of blue that we will remove, honoring min red:blue ratio
-            if params.min_red_to_blue_ratio > 0:
-                b_diff = min(mb, r_diff / params.min_red_to_blue_ratio)
-            else:
-                b_diff = mb
+          #amount of red that we will remove, honoring max red:blue ratio
+          r_diff = min(dr, params.max_red_to_blue_ratio)
 
-            res[i,j,0] = (imgColor[0]-r_diff) * 255.0
-            res[i,j,1] = (imgColor[1]       ) * 255.0
-            res[i,j,2] = (imgColor[2]-b_diff) * 255.0
+          #amount of blue that we will remove, honoring min red:blue ratio
+          if params.min_red_to_blue_ratio > 0:
+              b_diff = min(mb, r_diff / params.min_red_to_blue_ratio)
+          else:
+              b_diff = mb
 
-    #done return res
-    return res
+          res[i,j,0] = (imgColor[0]-r_diff) * 255.0
+          res[i,j,1] = (imgColor[1]       ) * 255.0
+          res[i,j,2] = (imgColor[2]-b_diff) * 255.0
+
+  #done return res
+  return res
 
 def Unpurple(params, img_original):
-     """Dados los parametros selecionados en el widget, la imagen con la aberracion se realiza toda la pipe de la solucion2
-    retorna la imagen corregida y la mascara usada
-    """
-    #generate blurred mask from original image
-    mask = MakePurpleBlur(params, img_original)
+  """Dados los parametros selecionados en el widget, la imagen con la aberracion se realiza toda la pipe de la solucion2
+  retorna la imagen corregida y la mascara usada
+  """
+  #generate blurred mask from original image
+  mask = MakePurpleBlur(params, img_original)
 
-    #use blurred mask to remove fringing
-    output = RemovePurpleBlur(params, img_original, mask)
+  #use blurred mask to remove fringing
+  output = RemovePurpleBlur(params, img_original, mask)
 
-    return mask,output
+  return mask,output
   
 #Estas funciones no se usan en el codigo pero han sido intentos realizados durante la practica
 #Forman parte de la solucion mencionada en conclusiones
@@ -340,14 +340,14 @@ def im_resize(img, alpha):
   return im2
 
 def mean2(x):
-    y = np.sum(x) / np.size(x);
-    return y
+  y = np.sum(x) / np.size(x);
+  return y
 
 def corr2(a,b):
-    a = a - mean2(a)
-    b = b - mean2(b)
-    r = (a*b).sum() / np.sqrt((a*a).sum() * (b*b).sum());
-    return r
+  a = a - mean2(a)
+  b = b - mean2(b)
+  r = (a*b).sum() / np.sqrt((a*a).sum() * (b*b).sum());
+  return r
 
 def scaleim(img, alpha):
   ydim,xdim = img.shape
@@ -408,28 +408,28 @@ def corregir_franja(copyimg):
   return imCORRECT
 
 def realce(x,A,B):
-    ''' Función para realizar el realce: si A < B = realce sombras y si A > B = realce claros'''
-    if A < 0:
-        A=0
-    if A > 255:
-        A=255
-    if B < 0:
-        B=0
-    if B > 255:
-        B=255
-    if x <= A:
-        y = round(B*x/A)
-    else:
-        y = round(((255-B)*x+(255*(B-A)))/(255-A))
-    return y
+  ''' Función para realizar el realce: si A < B = realce sombras y si A > B = realce claros'''
+  if A < 0:
+      A=0
+  if A > 255:
+      A=255
+  if B < 0:
+      B=0
+  if B > 255:
+      B=255
+  if x <= A:
+      y = round(B*x/A)
+  else:
+      y = round(((255-B)*x+(255*(B-A)))/(255-A))
+  return y
 
 def logaritmo(x, maxv, alfa=0.5):
-    c = maxv/np.log(1+(np.e**alfa-1)*maxv)
-    y=c*np.log(1+(np.e**alfa-1)*x)
-    return round(y)
+  c = maxv/np.log(1+(np.e**alfa-1)*maxv)
+  y=c*np.log(1+(np.e**alfa-1)*x)
+  return round(y)
 
 def exponencial(x, maxv, alfa=10):
-    x=x/maxv
-    c = maxv/((1+alfa)-1)
-    y=c*((1+alfa)**x-1)
-    return y
+  x=x/maxv
+  c = maxv/((1+alfa)-1)
+  y=c*((1+alfa)**x-1)
+  return y
