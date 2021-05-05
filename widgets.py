@@ -133,7 +133,7 @@ def img_slid(path_img):
 
     img = widgets.Dropdown(
         options=image_list,
-        value=5,
+        value=2,
         description='Imagen:',
     )
     return img
