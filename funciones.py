@@ -200,12 +200,12 @@ def MotionBlurX(radius, w, h, img):
   return blur
 
 def MotionBlurY(radius, w, h, img):
-    """se genera la borrisidad de la realizada en MotionBlurX para poder
+  """se genera la borrisidad de la realizada en MotionBlurX para poder
   capturar la aberracion. se recorre el kernel a lo alto de la imagen
   radius: rado del kernel a emborronar
   w,h: ancho y alto de la imagen
   img: imagen a sacar la mascara borrosa
-  retorna canal azul emborronado""""
+  retorna canal azul emborronado"""
   # make new array to hold the blur and initialize to full black
   blur = np.full_like(img,0)
 
