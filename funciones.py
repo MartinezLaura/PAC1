@@ -182,7 +182,7 @@ def MotionBlurX(radius, w, h, img):
   radius: rado del kernel a emborronar
   w,h: ancho y alto de la imagen
   img: imagen a sacar la mascara borrosa
-  retorna canal azul emborronado""""
+  retorna canal azul emborronado"""
     # make new array to hold the blur and initialize to full black
     blur = np.full_like(img,0)  
     #compute blur range
