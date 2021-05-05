@@ -43,7 +43,14 @@ def plot(img, name, space):
 
 def moving_w(k, img, mask, funct):
   """Metodo donde dando un kernel (matriz), movimiento 
-      y una region se realize la operacion deseada"""
+      y una region se realize la operacion deseada
+      k: tamano del kernel a pasar
+      img: imagen donde aplicar el kernel
+      mask: mascara binaria donde se aplicara el kernel
+      funct: funcion a aplicar al kernel, si en segundo parametro es
+              True se aplicara a toda la mascara
+              False se aplicra solo al pixel central
+      retorna imagen modificada"""
   idx = np.where(mask == 1)
   iter = idx[1].shape[0]
   print("Total de iteraciones de la MV: {}".format(iter))
@@ -127,7 +134,11 @@ def hist_thresh(img, banda, tipo):
   return bin_mask_min
 
 def autocontraste(x,a,b,minv=0,maxv=255):
-    '''Realiza el autocontraste llevando los puntos a y b a minv y maxv, respectivamente'''
+    '''Realiza el autocontraste llevando los puntos a y b a minv y maxv, respectivamente
+    x: pixel a tratar
+    a,b valores de thresh
+    minv, maxv: valores maximos de thresh
+    retorna pixel corregido'''
     if a < minv:
         a = minv
     if a > maxv:
@@ -156,7 +167,7 @@ def mean(img):
   z = np.mean(img[:,:,2])
   return [[x,y,z], False]
 
-#definiciones de funciones usadas para la solucion 3
+#definiciones de funciones usadas para la solucion 2
 class Params:
     radius = 5.0
     intensity = 1.0
@@ -166,9 +177,14 @@ class Params:
    
 #perform motion blur on a column in an image
 def MotionBlurX(radius, w, h, img):
+  """se genera la borrisidad en la imagen del canal azul para poder
+  capturar la aberracion. se recorre el kernel a lo ancho de la imagen
+  radius: rado del kernel a emborronar
+  w,h: ancho y alto de la imagen
+  img: imagen a sacar la mascara borrosa
+  retorna canal azul emborronado""""
     # make new array to hold the blur and initialize to full black
-    blur = np.full_like(img,0)
-    
+    blur = np.full_like(img,0)  
     #compute blur range
     ww = 2 * radius + 1
     for i in range(w):
@@ -176,16 +192,20 @@ def MotionBlurX(radius, w, h, img):
         acc = (radius + 2) * img[i,0,2]
         for j in range(1,int(radius)):
             acc += img[i,j,2]
-
         #perform blur operation
         for j in range(h):
             acc = acc - img[i,max(0,j-1-int(radius)),2] + img[i,min(h-1, j+int(radius)), 2]
             blur[i,j,2]=acc/ww
-
     #done -> return blur
     return blur
 
 def MotionBlurY(radius, w, h, img):
+    """se genera la borrisidad de la realizada en MotionBlurX para poder
+  capturar la aberracion. se recorre el kernel a lo alto de la imagen
+  radius: rado del kernel a emborronar
+  w,h: ancho y alto de la imagen
+  img: imagen a sacar la mascara borrosa
+  retorna canal azul emborronado""""
     # make new array to hold the blur and initialize to full black
     blur = np.full_like(img,0)
     
@@ -206,11 +226,19 @@ def MotionBlurY(radius, w, h, img):
     return blur
 
 def BoxBlur(radius,w,h,img):
+  """Se llaman a las funciones que dado un radio, ancho, alto de una imagen
+  se realiza la mascara borrosa necesaria para detectar y corregir la aberracion
+  retorna la mascara
+  """
     blurX = MotionBlurX(radius,w,h,img)
     blurY = MotionBlurY(radius,w,h,blurX)
     return blurY
 
 def DivUp(a,b):
+  """Dado un radio se divide por la mitad para pasar el desplazamiento, 
+  con respecto al pixel central, que tendra el kernel que realiza la mascara
+  se retorna el kernel
+  """
     r = a/b
     if a%b == 0:
         return r
@@ -218,21 +246,27 @@ def DivUp(a,b):
         return (r+1)
 
 def TentBlur(radius, w,h, img):
+  """Dado un radio, ancho, alto de una imagen, se generan la mascara donde se aplicara 
+  la metrica a partir de generar una aberracion mas fuerte en la imagen con el canal azul y 
+  seguidamente se genera una segunda mascara capturando la diferencia en el canal azul 
+  de la abeeracion creada y la original
+  retorna la mascara que se usara para la correccion
+  """
     tmp = BoxBlur(DivUp(radius,2),w,h,img)
     blur = BoxBlur(DivUp(radius,2),w,h,tmp)
     return tmp
 
 def MakePurpleBlur(params, img_original):
-    
+     """Dados los parametros selecionados en el widget y la imagen con la aberracion
+     se genera la mascara donde se realizara la correccion. Pasos explicados en cada funcion
+     retorna la mascara del componente azul a usar
+    """
     #get img dimensions
     dims = img_original.shape
-
     # make new array to hold the blur and initialize to full black
     mask = np.full_like(img_original,0)
-    
     #store min brightness
     thresh = params.min_brightness
-
     #use the blue component to define the intensity of the light
     #subject to unfocusing
     for i in range(dims[0]):
@@ -246,6 +280,10 @@ def MakePurpleBlur(params, img_original):
     return blur
 
 def RemovePurpleBlur(params, img, mask):
+    """Dados los parametros selecionados en el widget, la imagen con la aberracion y la mascara donde corregir,
+    se corrige la aberracion
+    retorna la imagen corregida
+    """
     #copy img to result
     res = img.copy()
     #get img dimensions
@@ -281,6 +319,9 @@ def RemovePurpleBlur(params, img, mask):
     return res
 
 def Unpurple(params, img_original):
+     """Dados los parametros selecionados en el widget, la imagen con la aberracion se realiza toda la pipe de la solucion2
+    retorna la imagen corregida y la mascara usada
+    """
     #generate blurred mask from original image
     mask = MakePurpleBlur(params, img_original)
 
@@ -289,7 +330,8 @@ def Unpurple(params, img_original):
 
     return mask,output
   
- #Estas funciones no se usan en el codigo pero han sido intentos realizados durante la practica
+#Estas funciones no se usan en el codigo pero han sido intentos realizados durante la practica
+#Forman parte de la solucion mencionada en conclusiones
 def im_resize(img, alpha):
   width = int(img.shape[1] * alpha)
   height = int(img.shape[0] * alpha)
