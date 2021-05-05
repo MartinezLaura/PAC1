@@ -257,9 +257,9 @@ def TentBlur(radius, w,h, img):
   return tmp
 
 def MakePurpleBlur(params, img_original):
-   """Dados los parametros selecionados en el widget y la imagen con la aberracion
-   se genera la mascara donde se realizara la correccion. Pasos explicados en cada funcion
-   retorna la mascara del componente azul a usar
+  """Dados los parametros selecionados en el widget y la imagen con la aberracion
+  se genera la mascara donde se realizara la correccion. Pasos explicados en cada funcion
+  retorna la mascara del componente azul a usar
   """
   #get img dimensions
   dims = img_original.shape
